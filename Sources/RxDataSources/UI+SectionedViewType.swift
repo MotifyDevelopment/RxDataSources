@@ -119,10 +119,18 @@ extension SectionedViewType {
             changes.insertedItems.map { IndexPath(item: $0.itemIndex, section: $0.sectionIndex) },
             animationStyle: animationConfiguration.insertAnimation
         )
-        reloadItemsAtIndexPaths(
-            changes.updatedItems.map { IndexPath(item: $0.itemIndex, section: $0.sectionIndex) },
-            animationStyle: animationConfiguration.reloadAnimation
-        )
+        if let handleCustomReloadAnimation = animationConfiguration.handleCustomReloadAnimation {
+            let indexPaths = changes.updatedItems.map { IndexPath(item: $0.itemIndex, section: $0.sectionIndex) }
+            reloadItemsAtIndexPaths(
+                handleCustomReloadAnimation(indexPaths),
+                animationStyle: animationConfiguration.reloadAnimation
+            )
+        } else {
+            reloadItemsAtIndexPaths(
+                changes.updatedItems.map { IndexPath(item: $0.itemIndex, section: $0.sectionIndex) },
+                animationStyle: animationConfiguration.reloadAnimation
+            )
+        }
         
         for (from, to) in changes.movedItems {
             moveItemAtIndexPath(
